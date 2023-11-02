@@ -1,15 +1,21 @@
-import express from 'express'
+import express from 'express';
+import mongoose from 'mongoose';
 import schoolroutes from "./routes/schoolRoutes.js";
 import env from 'dotenv';
+
 
 env.config();
 
 const app =  express();
 
-
+app.use(express.json());
 app.use('/api/school', schoolroutes);
 
+const dbpassword = process.env.DATABASEPASSWORD;
 const port = process.env.PORT;
 
+mongoose.connect(`mongodb+srv://babohmawuena12:${dbpassword}@cluster0.dwbqstc.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp`).then(
+    () => app.listen(port)
+).then(() => console.log(`Listenning on http://localhost:${port}`)).catch((error) => console.log(error))
 
-app.listen(port, () => console.log(`Listenning on http://localhost:${port}`))
+// app.listen(port, () => console.log(`Listenning on http://localhost:${port}`))

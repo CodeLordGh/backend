@@ -9,4 +9,4 @@ schoolroutes.put('/:id', updateSchool);
 schoolroutes.get('/:id', getSchoolByID);
 schoolroutes.delete('/:id', deleteSchool);
 
-export default schoolroutes
+export default schoolroutes;
