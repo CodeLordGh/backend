@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import schoolroutes from "./routes/schoolRoutes.js";
 import env from 'dotenv';
+import studentRoute from './routes/studentRoutes.js';
 
 
 env.config();
@@ -10,6 +11,7 @@ const app =  express();
 
 app.use(express.json());
 app.use('/api/school', schoolroutes);
+app.use('/api/student', studentRoute);
 
 const dbpassword = process.env.DATABASEPASSWORD;
 const port = process.env.PORT;
