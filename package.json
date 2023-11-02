@@ -1,26 +1,27 @@
 {
-  "name": "backend",
+  "name": "student-data-management-system",
   "version": "1.0.0",
-  "description": "",
+  "description": "A web based app for managing student data",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.ts"    
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodeLordGh/backend.git"
+  },
+  "author": "Mawuena Kossi Baboh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CodeLordGh/backend/issues"
+  },
+  "homepage": "https://github.com/CodeLordGh/backend#readme",
   "dependencies": {
-    "@types/jest": "^29.5.6",
-    "@types/mongodb": "^4.0.7",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "jest": "^29.7.0",
-    "mongodb": "^6.2.0",
-    "mongoos": "^0.0.1-security",
-    "ts-jest": "^29.1.1",
-    "typescript": "^5.2.2"
+    "mongoose": "^8.0.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.20"
+    "nodemon": "^3.0.1"
   }
 }
