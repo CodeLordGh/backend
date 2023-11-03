@@ -15,7 +15,7 @@ const studentSchema = new schema({
         type: Date,
         require: true
     },
-    class:{
+    level:{
         type: String,
         require: true
     }
