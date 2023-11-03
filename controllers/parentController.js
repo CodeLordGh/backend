@@ -1,109 +1,132 @@
-import propriatorModel from "../models/propriatorModel.js";
+import Parent from '../models/parentModel.js';
 
-//get all propriators
-const getAllPropriators = async (req, res) => {
+//get all parents
 
-    let propriator;
+const getAllParents = async (req, res) => {
+    let parents;
 
     try {
-        propriator = await propriatorModel.find();
+        parents = await Parent.find()
     } catch (error) {
-        res.status(500).json(error);
+        return console.log(error)
     }
-    if (!propriator) {
-        return res.status(400).json({ message: "No propriator found!" })
+    if(!parents){
+        return res.status(404).json({
+            message: 'No parent found'
+        })
     }
-
-    res.status(200).json({ propriator });
+    return res.status(200).json({ parents })
 }
 
-//get single propriator
+//Create new Parent
 
-export const getSinglePropriator = async (req, res) => {
-
-    const { id } = req.params;
-
-    let propriator;
+export const createParent = async (req, res) => {
+    const { name, location, occupation, phone } = req.body;
+    let existingParent;
 
     try {
-        propriator = await propriatorModel.findById(id);
-    } catch (error) {
-        res.status(500).json(error);
+        existingParent = await Parent.findOne({ phone })
+    }catch( error ) {
+        return res.json({error})
     }
-    if (!propriator) {
-        return res.status(400).json({ message: "No propriator found!" })
+    if (existingParent) {
+        return res.status(400).json({ message: "Parent already exist!" })
     }
-
-    res.status(200).json({propriator});
-}
-
-//create new propriator
-export const createPropriator = async (req, res) => {
-
-    const { name, phone } = req.body;
-    const propriatorId = req.params.id;
-    let existingPropriator;
-
-    try {
-        existingPropriator = await propriatorModel.findById(propriatorId)
-    } catch (error) {
-        return res.json(error)
-    }
-    if (existingPropriator) {
-        return res.status(400).json({ message: "Propriator already exists!" })
-    }
-
-    const propriator = new propriatorModel({
+    const parent = new Parent({
         name,
+        location,
+        occupation,
         phone,
-        password: "sirep"
+        password: 'sirep'
     })
+
     try {
-        propriator.save()
+        await parent.save()
     } catch (error) {
-        return res.json(error)
+        console.log(error);
+        return res.status(400).json({
+            message: "Error saving data to the database"
+        })
     }
-    res.status(201).json({propriator});
+    return res.status(201).json({
+        message: `Parent ${name} is successfully created!`
+    })
 }
 
-//update existing propriator
+//Update existing parent
 
-export const updatePropriator = async (req, res) => {
-
-    const { id } = req.params;
-    const { name, phone } = req.body;
-    let propriator;
+export const updateParent = async (req, res) => {
+    const parentID = req.params.id;
+    const { name, location, occupation, phone } = req.body;
+    let parent;
 
     try {
-        propriator = await propriatorModel.findByIdAndUpdate(id, {
+        parent = await Parent.findByIdAndUpdate(parentID, {
             name,
+            location,
+            occupation,
             phone
         })
     } catch (error) {
-        return res.json(error)
+        return res.status(404).json({ 
+            message: "Error getting parent from database!"
+         })
     }
-    if (!propriator) {
-        return res.status(400).json({ message: "No propriator found!" })
+    if (!parent) {
+        return res.status(400).json({
+            message: "No parent found!"
+        })
     }
-    res.status(201).json({propriator});
+    return res.status(201).json({
+        message: `Parent ${name} is successfully updated!`
+    })
 }
 
-//delete existing propriator
+//delete existing parent
 
-export const deletePropriator = async (req, res) => {
-
-    const { id } = req.params;
-    let propriator;
+export const deleteParent = async (req, res) => {
+    const parentID = req.params.id;
+    let parent;
 
     try {
-        propriator = await propriatorModel.findByIdAndDelete(id)
+        parent = await Parent.findByIdAndDelete(parentID)
     } catch (error) {
-        return res.json(error)
+        return res.status(404).json({ 
+            message: "Error getting parent from database!"
+         })
     }
-    if (!propriator) {
-        return res.status(400).json({ message: "No propriator found!" })
+    if (!parent) {
+        return res.status(400).json({
+            message: "No parent found!"
+        })
     }
-    res.status(201).json({propriator});
+    return res.status(201).json({
+        message: "Parent is successfully deleted!"
+    })
 }
 
-export default getAllPropriators;
+// get parent by id
+
+export const getParentById = async (req, res) =>{
+    const parentID = req.params.id;
+    let parent;
+
+    try {
+        parent = await Parent.findById(parentID)
+    } catch (error) {
+        return res.status(404).json({ 
+            message: "Error getting parent from database!"
+         })
+    }
+    if (!parent) {
+        return res.status(400).json({
+            message: "No parent found!"
+        })
+    }
+    return res.status(201).json({
+        message: "Parent is successfully retrieved!",
+        parent
+    })
+}
+
+export default getAllParents;

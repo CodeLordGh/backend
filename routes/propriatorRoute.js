@@ -1,5 +1,5 @@
 import express from 'express';
-import getAllPropriators, { createPropriator, deletePropriator, getSinglePropriator, updatePropriator } from '../controllers/parentController.js';
+import getAllPropriators, { createPropriator, deletePropriator, getSinglePropriator, updatePropriator } from '../controllers/proprietorController.js';
 
 const propriatorRoute = express.Router();
 

@@ -1,6 +1,5 @@
 import Student from '../models/studentModel.js';
 
-
 //get all students
 const getAllStudents = async (req, res) => {
     let students;
