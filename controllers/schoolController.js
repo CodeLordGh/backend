@@ -93,9 +93,10 @@ export const deleteSchool = async (req, res) => {
             message: "School not found"
         })
     }
-    return res.status(200).json({message: `School deleted successfully`})
+    return res.status(200).json({message: `School deleted successfully`, school})
 }
 
+// get school by id
 export const getSchoolByID = async (req, res) => {
     const schoolID = req.params.id;
 

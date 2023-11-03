@@ -12,7 +12,7 @@ const studentSchema = new schema({
         require: true
     },
     dateofbirth: {
-        type: Date,
+        type: String,
         require: true
     },
     level:{
@@ -21,4 +21,4 @@ const studentSchema = new schema({
     }
 })
 
-export default mongoose.model('Student', schoolSchema)
+export default mongoose.model('Student', studentSchema)

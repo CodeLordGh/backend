@@ -24,7 +24,7 @@ export const createStudent = async (req, res) => {
     let existingStudent;
 
     try {
-        existingStudent = Student.findOne({ firstname, lastname })
+        existingStudent = await Student.findOne({ firstname, lastname })
     } catch (error) {
         return console.log(error);
     }
@@ -42,6 +42,7 @@ export const createStudent = async (req, res) => {
     try {
         await student.save()
     } catch (error) {
+        console.log(error);
         return res.status(400).json({
             message: "Error saving data to the database"
         })
@@ -77,6 +78,51 @@ export const updateStudent = async (req, res) => {
     }
     return res.status(201).json({
         message: `Student ${firstname} ${lastname} is successfully updated!`
+    })
+}
+
+//delete existing student
+export const deleteStudent = async (req, res) => {
+    const studentID = req.params.id;
+    let student;
+
+    try {
+        student = await Student.findByIdAndDelete(studentID)
+    } catch (error) {
+        return res.status(404).json({ 
+            message: "Error getting student from database!"
+         })
+    }
+    if (!student) {
+        return res.status(400).json({
+            message: "No student found!"
+        })
+    }
+    return res.status(201).json({
+        message: "Student is successfully deleted!"
+    })
+}
+
+// get student by id
+export const getStudentById = async (req, res) =>{
+    const studentID = req.params.id;
+    let student;
+
+    try {
+        student = await Student.findById(studentID)
+    } catch (error) {
+        return res.status(404).json({ 
+            message: "Error getting student from database!"
+         })
+    }
+    if (!student) {
+        return res.status(400).json({
+            message: "No student found!"
+        })
+    }
+    return res.status(201).json({
+        message: "Student is successfully retrieved!",
+        student
     })
 }
 
