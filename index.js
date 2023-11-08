@@ -8,6 +8,7 @@ import propriatorRoute from './routes/propriatorRoute.js';
 import teacherRoutes from './routes/teacherRoutes.js';
 import parentRoutes from './routes/parentRoutes.js';
 import adminOneRoute from './routes/adminOneRoutes.js';
+import userRoute from './routes/userRoute.js';
 
 
 env.config();
@@ -15,6 +16,8 @@ env.config();
 const app =  express();
 
 app.use(express.json());
+
+app.use('/api', userRoute)
 app.use('/api/school', schoolroutes);
 app.use('/api/student', studentRoute);
 app.use('/api/headmaster', headmasterRoute);

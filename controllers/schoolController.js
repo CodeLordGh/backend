@@ -1,8 +1,9 @@
 import School from "../models/schoolModel.js";
+import mongoose from "mongoose";
 
 
 //Get all schools
-const getAllSchools = async (req, res, next) => {
+const getAllSchools = async (req, res) => {
     let schools;
     try {
         schools = await School.find();
@@ -99,6 +100,12 @@ export const deleteSchool = async (req, res) => {
 // get school by id
 export const getSchoolByID = async (req, res) => {
     const schoolID = req.params.id;
+
+    if(!mongoose.Types.ObjectId.isValid(schoolID)){
+        return res.status(400).json({
+            message: "Invalid ID"
+        })
+    }
 
     let school;
     try {

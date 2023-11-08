@@ -1,5 +1,6 @@
 import express from "express";
 import getAllSchools, { createSchool, deleteSchool, getSchoolByID, updateSchool } from "../controllers/schoolController.js";
+import authUser from "../middleware/auth.js";
 
 const schoolroutes = express.Router()
 

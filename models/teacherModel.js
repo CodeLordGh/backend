@@ -16,6 +16,19 @@ const teacherSchema = new schema({
         type: String,
         required: true
     },
+    school:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'School',
+        required: true
+    },
+    classes: [{
+        type: String,
+        required: true,
+    }],
+    subjects: [{
+        type: String,
+        required: true,
+    }],
     password: {
         type: String,
         required: true

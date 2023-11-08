@@ -9,7 +9,13 @@ const headmasterSchema = new schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
+        lowercase: true,
+        validate: {
+            validator: (email) => email && email.include('@')
+        },
+        message: "Email must be valid"
     },
     phone: {
         type: String,

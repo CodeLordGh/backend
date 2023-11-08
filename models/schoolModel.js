@@ -20,6 +20,16 @@ const schoolSchema = new schema({
         required: true,
         unique: true
     },
+    user: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    }],
+    student: [{
+        type: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Student',
+        }]
+    }],
     location: {
         type: String,
         required: true
@@ -29,6 +39,6 @@ const schoolSchema = new schema({
         required: true,
         unique: true
     }
-})
+}, { timestamps: true })
 
 export default mongoose.model('School', schoolSchema)
