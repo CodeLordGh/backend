@@ -20,15 +20,9 @@ const schoolSchema = new schema({
         required: true,
         unique: true
     },
-    user: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-    }],
     student: [{
-        type: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Student',
-        }]
+        type: mongoose.Types.ObjectId,
+        ref: 'Student',
     }],
     location: {
         type: String,
@@ -38,7 +32,13 @@ const schoolSchema = new schema({
         type: String,
         required: true,
         unique: true
-    }
+    },
+    users: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+    }]
 }, { timestamps: true })
 
-export default mongoose.model('School', schoolSchema)
+const School = mongoose.model('School', schoolSchema);
+
+export default School;

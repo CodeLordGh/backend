@@ -40,6 +40,8 @@ export const createSchool = async (req, res) => {
         headmastername,
         schoolline,
         location,
+        user: [],
+        student: [],
         email
     })
     try {

@@ -9,9 +9,9 @@ const userSchema = new schema({
     },
     role: {
         type: String,
-        required: true,
         enum: ['adminone', 'headmaster', 'teacher', 'proprietor', 'parent'],
         default: 'parent',
+        required: true
     },
     phone: {
         type: String,
@@ -23,13 +23,12 @@ const userSchema = new schema({
         required: true
     },
     school: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Types.ObjectId,
         ref: 'School',
         required: true
     },
     email: {
         type: String,
-        required: true,
         unique: true,
         lowercase: true,
         validate: {
@@ -44,7 +43,6 @@ const userSchema = new schema({
     },
     occupation: {
         type: String,
-        required: true,
         validate: {
             validator: function(occupation){
                 if(User.role === 'parent'){
@@ -53,13 +51,33 @@ const userSchema = new schema({
                 return true; // no validation for user role
             },
             message: "Occupation must be valid"
+        },
+        
+    },
+    classes: [{
+        type: String,
+        validate: {
+            validator: function(classes){
+                if(User.role === 'teacher'){
+                    return classes && classes.length > 4 ;
+                }
+                return true; // no validation for user role
+            },
+            message: "Classes must be valid"
         }
-    },
-    school:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'School',
-        required: true
-    },
+    }],
+    subjects: [{
+        type: String,
+        validate: {
+            validator: function(subjects){
+                if(User.role === 'teacher'){
+                    return subjects && subjects.length > 4 ;
+                }
+                return true; // no validation for user role
+            },
+            message: "Subjects must be valid"
+        }
+    }],
     password: {
         type: String,
         required: true

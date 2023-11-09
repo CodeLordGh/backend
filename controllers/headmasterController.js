@@ -1,4 +1,3 @@
-import headMasterModel from "../models/headMasterModel.js";
 
 //get all headmasters regardless of the school
 const getAllHeadMasters = async ( req, res ) => {

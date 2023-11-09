@@ -1,4 +1,3 @@
-import teacherModel from "../models/teacherModel.js";
 
 // get all teachers
 const getAllTeachers = async (req, res) => {

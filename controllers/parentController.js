@@ -1,4 +1,3 @@
-import Parent from '../models/parentModel.js';
 
 //get all parents
 

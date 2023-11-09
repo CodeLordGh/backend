@@ -1,4 +1,3 @@
-import propriatorModel from "../models/propriatorModel.js";
 
 //get all propriators
 const getAllPropriators = async (req, res) => {

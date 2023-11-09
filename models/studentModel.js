@@ -13,7 +13,7 @@ const studentSchema = new schema({
     },
     dateofbirth: {
         type: String,
-        require: true
+        required: true
     },
     level:{
         type: String,

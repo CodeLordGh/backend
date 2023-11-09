@@ -2,13 +2,14 @@ import User from "../models/userModel.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 import mongoose from "mongoose";
+import School from "../models/schoolModel.js";
 
 const user = {
-    getAllusers: (req, res) =>{
+    getAllusers: async (req, res) =>{
         let user;
 
         try {
-            user = User.find()
+            user = await User.find()
         } catch (error) {
             return console.log(error)
         }
@@ -21,37 +22,46 @@ const user = {
     },
 
     createUser: async (req, res) => {
-        const { name, phone, location, password, email, role, occupation, schoolID } = req.body;
+        const { name, phone, location, password, email, role, occupation, school, classes, subjects } = req.body;
         let existingUser;
+        let existingSchool;
         
-        if (!name || !phone || !location || password || role || schoolID) {
+        if (!name || !phone || !location || !password || !role || !school) {
             return res.status(400).json({
                 message: "All fields are required"
             })
         }
 
-        if(!mongoose.Schema.Types.ObjectId.isValid(schoolID)){
-            return res.status(400).json({
-                message: "Invalid ID"
-            });
+        try {
+            existingSchool = await School.findById(school)
+        } catch (error) {
+            return console.log(error);
         }
 
+        if (!existingSchool) {
+            return res.status(400).json({ message: "SchoolId doesn't match any ID in the database!" })
+        }
+
+        if((role === 'headmaster' || role === 'proprietor' || role === 'adminone') && await User.find({role, school})){
+            return res.status(400).json({ message: `User with this role already exists for this school!` })
+        }
         try {
-            existingUser = await User.findOne({ phone })
+            existingUser = await User.findOne({ phone } || {email})
         } catch (error) {
             return console.log(error);
         }
         if (existingUser) {
-            return res.status(400).json({ message: "User already exist!" })
+            res.status(400)
         }
-        
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = new User({
             name,
             phone,
+            role,
             location,
-            schoolID,
+            school,
             password : hashedPassword
         })
 
@@ -63,15 +73,31 @@ const user = {
             user.occupation = occupation
         }
 
-        try {
-            await user.save()
-        } catch (error) {
-            console.log(error);
-            return res.status(400).json({
-                message: "Error saving data to the database"
-            })
+        if (role === 'teacher'){
+            user.classes = classes
+            user.subjects = subjects
         }
         
+
+        const session = await mongoose.startSession();
+        try {          
+            // Start a transaction
+            session.startTransaction();
+          
+            await user.save({ session });
+            existingSchool.users.push(user._id);
+            await existingSchool.save({ session });
+          
+            // Commit the transaction
+            await session.commitTransaction();
+          
+            // End the session
+            await session.endSession();
+        } catch (error) {
+            console.log(error);
+            return res.status(400).json({ message: 'Error saving data to the database' });
+        }
+          
         return res.status(201).json({
             message: `User ${name} ${phone} is successfully created!`
         })
@@ -105,6 +131,26 @@ const user = {
             user
         })
 
+    },
+
+    getRoleBasedUsers: async (req, res) =>{
+        const { role, school } = req.body;
+        let users;
+
+        if (!role ||!school) {
+            return res.status(400).json({ message: "All fields are mandatory!" })
+        }
+
+        try {
+            users = await User.find({ role, school })
+        } catch (error) {
+            return console.log(error);
+        }
+        if (!users) {
+            return res.status(400).json({ message: "No users found!" })
+        }
+        
+        return res.status(200).json({ users })
     }
 }
 

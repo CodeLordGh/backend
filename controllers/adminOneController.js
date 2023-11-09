@@ -1,4 +1,3 @@
-import AdminOne from "../models/adminOneModel.js";
 
 //get all AdminOnes
 const getAllAdminOne = async (req, res) => {
