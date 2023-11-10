@@ -26,11 +26,7 @@ const studentSchema = new schema({
     dateofbirth: {
         type: String,
         required: true
-    },
-    level:{
-        type: String,
-        require: true
     }
-})
+}, {timestamps: true})
 
 export default mongoose.model('Student', studentSchema)

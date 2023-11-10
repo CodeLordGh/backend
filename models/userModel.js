@@ -27,19 +27,18 @@ const userSchema = new schema({
         ref: 'School',
         required: true
     },
-    // email: {
-    //     type: String,
-    //     unique: true,
-    //     validate: {
-    //         validator: function(email){
-    //             if(User.role === 'headmaster'){
-    //                 return email && email.includes('@')
-    //             }
-    //             return true; // no validation for user role
-    //         },
-    //         message: "Email must be valid"
-    //     },
-    // },
+    children: [{
+        type: String,
+        validate: {
+            validator: function(children){
+                if(User.role === 'parent'){
+                    return children
+                }
+                return true; // no validation for user role
+            },
+            message: "parent must be valid"
+        },
+    }],
     occupation: {
         type: String,
         validate: {

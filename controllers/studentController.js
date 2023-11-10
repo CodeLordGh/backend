@@ -1,4 +1,7 @@
 import Student from '../models/studentModel.js';
+import User from '../models/userModel.js';
+import School from '../models/schoolModel.js';
+import mongoose from 'mongoose'
 
 //get all students
 const getAllStudents = async (req, res) => {
@@ -19,8 +22,22 @@ const getAllStudents = async (req, res) => {
 
 //Create new Student
 export const createStudent = async (req, res) => {
-    const { firstname, lastname, level, dateofbirth } = req.body;
+    const { firstname, lastname, level, dateofbirth, parent, school } = req.body;
     let existingStudent;
+    let existingSchool;
+    let existingParent;
+
+    if(!(firstname || lastname || level || dateofbirth || parent || school)){
+        return res.status(400).json({message: "All fields are required!"})
+    }
+
+    try{
+        existingParent = await User.findById(parent)
+        existingSchool = await School.findById(school)
+    }catch(error){
+        console.log(error)
+        return res.json({message: "Error checking existing user or existing school!"})
+    }
 
     try {
         existingStudent = await Student.findOne({ firstname, lastname })
@@ -35,11 +52,25 @@ export const createStudent = async (req, res) => {
         firstname,
         lastname,
         dateofbirth,
+        school,
+        parent,
         level
     })
 
     try {
-        await student.save()
+        const session = await  mongoose.startSession();
+        session.startTransaction();
+
+        await student.save({session})
+        existingParent.children.push(student._id);
+        existingSchool.student.push(student._id);
+        await existingSchool.save({session});
+        await existingParent.save({session});
+
+        await session.commitTransaction()
+
+        await session.endSession()
+
     } catch (error) {
         console.log(error);
         return res.status(400).json({
