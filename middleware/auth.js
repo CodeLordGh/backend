@@ -1,6 +1,7 @@
 const authUser = {
     isAdminone : async (req, res, next) => {
-        if(req.user.role === 'admin'){
+        const {role} = req.body
+        if(role === 'adminone'){
             next();
         }else{
             res.status(401).json({

@@ -3,11 +3,6 @@ import mongoose from 'mongoose';
 import schoolroutes from "./routes/schoolRoutes.js";
 import env from 'dotenv';
 import studentRoute from './routes/studentRoutes.js';
-import headmasterRoute from './routes/headmasterRoute.js';
-import propriatorRoute from './routes/propriatorRoute.js';
-import teacherRoutes from './routes/teacherRoutes.js';
-import parentRoutes from './routes/parentRoutes.js';
-import adminOneRoute from './routes/adminOneRoutes.js';
 import userRoute from './routes/userRoute.js';
 
 
@@ -20,11 +15,7 @@ app.use(express.json());
 app.use('/api', userRoute)
 app.use('/api/school', schoolroutes);
 app.use('/api/student', studentRoute);
-app.use('/api/headmaster', headmasterRoute);
-app.use('/api/propriator', propriatorRoute);
-app.use('/api/teacher', teacherRoutes);
-app.use('/api/parent', parentRoutes);
-app.use('/api/adminone', adminOneRoute);
+
 
 const dbpassword = process.env.DATABASEPASSWORD;
 const port = process.env.PORT;

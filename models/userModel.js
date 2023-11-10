@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const schema = mongoose.Schema;
+const schema = mongoose.Schema
 
 const userSchema = new schema({
     name: {
@@ -27,20 +27,19 @@ const userSchema = new schema({
         ref: 'School',
         required: true
     },
-    email: {
-        type: String,
-        unique: true,
-        lowercase: true,
-        validate: {
-            validator: function(email){
-                if(User.role === 'headmaster'){
-                    return email && email.includes('@')
-                }
-                return true; // no validation for user role
-            },
-            message: "Email must be valid"
-        },
-    },
+    // email: {
+    //     type: String,
+    //     unique: true,
+    //     validate: {
+    //         validator: function(email){
+    //             if(User.role === 'headmaster'){
+    //                 return email && email.includes('@')
+    //             }
+    //             return true; // no validation for user role
+    //         },
+    //         message: "Email must be valid"
+    //     },
+    // },
     occupation: {
         type: String,
         validate: {
@@ -82,7 +81,7 @@ const userSchema = new schema({
         type: String,
         required: true
     }
-})
+}, { timestamps: true })
 
 const User = mongoose.model("User", userSchema);
 
