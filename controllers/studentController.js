@@ -115,13 +115,28 @@ export const updateStudent = async (req, res) => {
 export const deleteStudent = async (req, res) => {
     const studentID = req.params.id;
     let student;
+    const linkedParent = await User.findOne({children: studentID})
+    const linkedSchool = await School.findOne({students: studentID})
 
     try {
+        const session = await mongoose.startSession()
+        session.startTransaction();
         student = await Student.findByIdAndDelete(studentID)
+        linkedParent.children.pull(studentID);
+        linkedSchool.student.pull(studentID);
+        await linkedSchool.save({session});
+        await linkedParent.save({session});
+        await session.commitTransaction()
     } catch (error) {
+
+        await session.abortTransaction()
+
+        console.log(error);
         return res.status(404).json({ 
-            message: "Error getting student from database!"
+            message: "Error performing operations in the database!"
          })
+    }finally {// End session regardless of the outcome
+        await session.endSession()
     }
     if (!student) {
         return res.status(400).json({

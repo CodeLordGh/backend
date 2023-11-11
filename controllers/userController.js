@@ -1,6 +1,6 @@
 import User from "../models/userModel.js";
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken'
+import jwt, { sign } from 'jsonwebtoken'
 import mongoose from "mongoose";
 import School from "../models/schoolModel.js";
 
@@ -89,10 +89,6 @@ const user = {
             password : hashedPassword
         })
 
-        // if (role === 'headmaster'){
-        //     user.email = email
-        // }
-
         if(role === 'parent'){
             user.occupation = occupation
         }
@@ -121,17 +117,60 @@ const user = {
             console.log(error);
             return res.status(400).json({ message: 'Error saving data to the database' });
         }
-          
-        return res.status(201).json({
-            message: `User ${name} ${phone} is successfully created!`
-        })
+
+        const token = jwt.sign(
+            {
+                _id: user._id,
+                role: user.role,
+                school: user.school,
+                name: user.name,
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: '1h'
+            }
+        )
+
+        req.session.user = user;
+        req.session.token = token;
+
+        res.cookie('token', token, { maxAge: 900000, httpOnly: true });
+        return res.send({ success: true, token });
+        // return res.status(201).json({
+        //     message: `User ${name} ${phone} is successfully created!`
+        // })
     },
 
     //update user info
     updateUser: async (req, res) => {
-        const { name, phone, location, password, email, role, occupation, school, classes, subjects } = req.body;
+        const { id } = req.params;
         let user;
+        
+        if (!id) {
+            return res.status(400).json({ message: "All fields are mandatory!" })
+        }
 
+        try {
+            user = await User.findByIdAndUpdate( id, {
+                name: req.body.name,
+                phone: req.body.phone,
+                role: req.body.role,
+                location: req.body.location,
+                occupation: req.body.occupation,
+                school: req.body.school,
+                classes: req.body.classes,
+                subjects: req.body.subjects
+            })
+        } catch (error) {
+            console.log(error);
+            return res.status(400).json({ message: 'Error updating data to the database' });
+        }
+        if (!user) {
+            return res.status(400).json({ message: "User not found!" })
+        }
+        return res.status(200).json({
+            message: `User ${id} is successfully updated!`
+        })
     },
 
     //delete user
@@ -158,15 +197,21 @@ const user = {
             session.startTransaction();
           
             await user.deleteOne({ session });
+            const index = user.school.users.indexOf(user._id);
+            user.school.users.splice(index, 1);
+            await user.school.save({ session });
+            await user.save({ session });
           
             // Commit the transaction
             await session.commitTransaction();
           
-            // End the session
-            await session.endSession();
         } catch (error) {
             console.log(error);
+            await session.abortTransaction()
             return res.status(400).json({ message: 'Error deleting data from the database' });
+        }finally{
+            // End the session
+            await session.endSession();
         }
           
         return res.status(200).json({
@@ -199,12 +244,14 @@ const user = {
         
         const token = jwt.sign({ phone, role: user.role, userId: user._id }, process.env.JWT_SECRET, { expiresIn: 3600 })
         
+        res.cookie('token', token, { maxAge: 900000, httpOnly: true });
+        res.send({ success: true, token });
+
         // return res.status(200).json({
         //     token,
         //     user
         // })
-        res.redirect('/api/users/profile')
-
+        // res.redirect('/api/users/profile')
     },
 
     // get users by role and school

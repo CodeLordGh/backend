@@ -1,5 +1,7 @@
 import School from "../models/schoolModel.js";
 import mongoose from "mongoose";
+import Student from "../models/studentModel.js";
+import User from "../models/userModel.js";
 
 
 //Get all schools
@@ -61,6 +63,7 @@ export const updateSchool = async (req, res) => {
     const { name, propriatorname, headmastername, schoolline, location, email } = req.body;
     let school;
 
+    
     try {
         school = await School.findByIdAndUpdate(id, {
             name,
@@ -86,10 +89,21 @@ export const deleteSchool = async (req, res) => {
     const id = req.params.id
     let school;
 
+    const session = await mongoose.startSession()
+    session.startTransaction()
+
     try {
+        await Student.remove({ school: id }, { session });
+        await User.remove({ school: id }, { session });
+
         school = await School.findByIdAndDelete(id);
+        await session.commitTransaction();
     } catch (error) {
-        return console.log(error)
+        await session.abortTransaction();
+        return res.status(500).json({ error: 'Error deleting school' });
+        // return console.log(error)
+    }finally {
+        await session.endSession();  
     }
     if(!school){
         return res.status(404).json({
