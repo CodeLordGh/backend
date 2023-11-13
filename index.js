@@ -19,14 +19,14 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: "nacHOlyt457BV",
     resave: false,
-    saveUninitialized: true,
-    cookie: {
-        secure: true,
-        maxAge: 1000 * 60 * 60 * 24,
-        httpOnly: true,
-    },
+    saveUninitialized: true
+    // cookie: {
+    //     secure: true,
+    //     maxAge: 1000 * 60 * 60 * 24,
+    //     httpOnly: true,
+    // },
 }))
 
 app.use('/api', userRoute)

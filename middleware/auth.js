@@ -1,14 +1,31 @@
-const authUser = {
-    isAdminone : async (req, res, next) => {
-        const {role} = req.body
-        if(role === 'adminone'){
-            next();
-        }else{
-            res.status(401).json({
-                message: "You are not authorized to access this resource"
+import jwt from 'jsonwebtoken'
+
+const auth = {
+    authUser : async (req, res, next) => {
+        const token = req.cookies.token
+        if (!token) {
+            return res.status(401).json({
+                message: 'Unauthorized! Token not provided'
             })
         }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        if (!decoded) {
+            return res.status(401).json({
+                message: 'Unauthorized'
+            })
+        }
+        req.userId = decoded.userId
+        req.userRole = decoded.role
+        next()
+    },
+    authRoleStudent: (req, res, next) =>{
+        if(req.userRole!== "adminone"  && req.userRole !== "adminzero"){
+            return res.status(401).json({
+                message: 'Unauthorized'
+            })
+        }
+        next()
     }
 }
 
-export default authUser;
+export default auth;

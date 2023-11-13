@@ -1,6 +1,6 @@
 import User from "../models/userModel.js";
 import bcrypt from 'bcrypt';
-import jwt, { sign } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import mongoose from "mongoose";
 import School from "../models/schoolModel.js";
 
@@ -28,6 +28,13 @@ const user = {
         const id = req.params.id;
         console.log(id);
         let user;
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({
+                message: 'Invalid user ID'
+            })
+        }
+
         try {
             user = await User.findById(id)
         } catch (error) {
@@ -223,6 +230,7 @@ const user = {
     loginUser: async (req, res) => {
         const { phone, password } = req.body;
         let user;
+        let token;
         
         if (!phone ||!password) {
             return res.status(400).json({ message: "All fields are mandatory!" })
@@ -238,20 +246,23 @@ const user = {
         }
         
         const validPassword = await bcrypt.compare(password, user.password);
+        
         if (!validPassword) {
             return res.status(400).json({ message: "Invalid password!" })
         }
         
-        const token = jwt.sign({ phone, role: user.role, userId: user._id }, process.env.JWT_SECRET, { expiresIn: 3600 })
-        
-        res.cookie('token', token, { maxAge: 900000, httpOnly: true });
-        res.send({ success: true, token });
 
-        // return res.status(200).json({
-        //     token,
-        //     user
-        // })
-        // res.redirect('/api/users/profile')
+        if(user.role === 'adminone' || user.role === 'headmaster'){
+            token = jwt.sign({ phone, role: user.role, userId: user._id, school: user.school}, process.env.JWT_SECRET, { expiresIn: 3600 })
+        }else if (user.role === 'teacher'){
+            token = jwt.sign({ phone, role: user.role, userId: user._id, school: user.school, classes: user.classes, subjects: user.subjects}, process.env.JWT_SECRET, { expiresIn: 3600 })
+        }
+        else{
+            token = jwt.sign({ phone, role: user.role, userId: user._id}, process.env.JWT_SECRET, { expiresIn: 3600 })
+        }
+        
+        res.cookie("token", token, { maxAge: 900000, httpOnly: true });
+        res.send({ success: true, token });
     },
 
     // get users by role and school
@@ -274,6 +285,24 @@ const user = {
         }
         
         return res.status(200).json({ users })
+    },
+    userProfile: async (req, res) => {
+        const token = req.cookies.token
+
+        if (!token) {
+            return res.status(400).json({ message: "No token provided!" })
+        }
+
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET)
+            const user = await User.findById(decoded.userId)
+            if (!user) {
+                return res.status(400).json({ message: "User not found!" })
+            }
+            return res.status(200).json({message: `Welcome ${user.name}`})
+        } catch (error) {
+            return res.status(400).json({ message: "Invalid token!" })
+        }
     }
 }
 

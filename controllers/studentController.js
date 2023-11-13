@@ -6,18 +6,29 @@ import mongoose from 'mongoose'
 //get all students
 const getAllStudents = async (req, res) => {
     let students;
-
+    const userId = req.userId;
+    let user;
     try {
-        students = await Student.find()
+        user = await User.findById(userId);
     } catch (error) {
-        return console.log(error)
+        console.log(error)
+        return res.status(400).json({message: "Error getting user!"})
     }
-    if(!students){
-        return res.status(404).json({
-            message: 'No student found'
-        })
-    }
-    return res.status(200).json({ students })
+
+    if (user.role === 'adminzero') {
+        students = await Student.find({});
+     } else if (['headmaster', 'adminone'].includes(user.role)) {
+        students = await Student.find({ school: user.school });
+     } else if (user.role === 'teacher') {
+        students = await Student.find({
+          teacher: user._id,
+          class: { $in: user.classes },
+        });
+     } else if (user.role === 'parent') {
+        students = await Student.find({ _id: { $in: user.children } });
+     }
+    
+     res.status(200).json(students);
 }
 
 //Create new Student
@@ -27,7 +38,7 @@ export const createStudent = async (req, res) => {
     let existingSchool;
     let existingParent;
 
-    if(!(firstname || lastname || level || dateofbirth || parent || school)){
+    if(!firstname || !lastname || !level || !dateofbirth || !parent || !school){
         return res.status(400).json({message: "All fields are required!"})
     }
 
@@ -95,7 +106,7 @@ export const updateStudent = async (req, res) => {
             lastname,
             level,
             dateofbirth
-        })
+        }, {new: true})
     } catch (error) {
         return res.status(404).json({ 
             message: "Error getting student from database!"
@@ -107,7 +118,7 @@ export const updateStudent = async (req, res) => {
         })
     }
     return res.status(201).json({
-        message: `Student ${firstname} ${lastname} is successfully updated!`
+        message: `Student ${firstname} ${lastname} is successfully updated!`, student
     })
 }
 
@@ -151,6 +162,7 @@ export const deleteStudent = async (req, res) => {
 // get student by id
 export const getStudentById = async (req, res) =>{
     const studentID = req.params.id;
+    console.log(studentID);
     let student;
 
     try {
