@@ -31,6 +31,8 @@ const grade = {
     // middleware to add new grade to student and save the newly grade to the grade collection
     addGrade: async (req, res) => {
         const { studentId, score, subject } = req.body;
+        const userClasses = req.userClasses
+        
         let student;
         
         if (!studentId ||!score) {
@@ -52,6 +54,12 @@ const grade = {
             subject,
             grades: getGrade(score)
         })
+
+        if(req.userRole === 'teacher'){
+            if (!userClasses.includes(student.level) || !req.userSubjects.includes(subject)) {
+                return res.status(400).json({ message: "You are not authorized to grade this subject!" })
+            }
+        }
         
         try {
             const session = await mongoose.startSession();

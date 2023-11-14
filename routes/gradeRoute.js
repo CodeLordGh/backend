@@ -1,9 +1,10 @@
 import express from 'express';
 import grade from '../controllers/gradeController.js';
+import auth from '../middleware/auth.js';
 
 const gradeRoute = express.Router()
 
-gradeRoute.post('/addGrade', grade.addGrade)
+gradeRoute.post('/addGrade',auth.authUser, auth.authRoleTeacher, grade.addGrade)
 
 gradeRoute.get('/getAllGrades/:studentId', grade.getAllGrades)
 
