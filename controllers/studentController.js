@@ -162,24 +162,74 @@ export const deleteStudent = async (req, res) => {
 // get student by id
 export const getStudentById = async (req, res) =>{
     const studentID = req.params.id;
-    console.log(studentID);
+    const userID = req.userId;
     let student;
+    let user;
+
 
     try {
-        student = await Student.findById(studentID)
+        user = await User.findById(userID)
     } catch (error) {
+        console.log(error);
         return res.status(404).json({ 
-            message: "Error getting student from database!"
+            message: "Error getting user from database!"
          })
     }
-    if (!student) {
-        return res.status(400).json({
-            message: "No student found!"
+
+
+    if (user.role === 'adminzero') {
+        student = await Student.findById(studentID)
+        return res.status(201).json({
+            message: "Student is successfully retrieved!",
+            student
+        })
+    } else if (['headmaster', 'adminone'].includes(user.role)) {
+
+        try {
+            student = await Student.findById(studentID)
+        
+            if(student.school.toString() !== user.school.toString()){
+                return res.status(400).json({
+                    message: "You are not authorized to view this student!"
+                })
+            }
+            return res.status(201).json({
+                message: "Student is successfully retrieved!",
+                student
+            })
+        } catch (error) {
+            console.log(error);
+            return res.status(404).json({ 
+                message: "Error getting student from database!"
+             })
+        }
+
+        
+    } else if (user.role === 'teacher') {
+        student = await Student.findById({_id: studentID, school: user.school})
+        if(!user.classes.includes(student.level)){
+            return res.status(400).json({
+                message: "You are not authorized to view this student!"
+            })
+        }
+        return res.status(201).json({
+            message: "Student is successfully retrieved!",
+            student
+        })
+    } else if (user.role === 'parent') {
+        student = await Student.findById({_id: studentID, school: user.school})
+        if(!user.children.includes(student._id)){
+            return res.status(400).json({
+                message: "You are not authorized to view this student!"
+            })
+        }
+        return res.status(201).json({
+            message: "Student is successfully retrieved!",
+            student
         })
     }
-    return res.status(201).json({
-        message: "Student is successfully retrieved!",
-        student
+    return res.status(404).json({
+        message: "Student not found!"
     })
 }
 

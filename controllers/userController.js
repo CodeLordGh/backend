@@ -5,14 +5,40 @@ import mongoose from "mongoose";
 import School from "../models/schoolModel.js";
 
 const user = {
-    // get all users regardless of the school location or any other querry
+    // get all users based on role
     getAllusers: async (req, res) =>{
         let user;
+        const currentUserRole = req.userRole;
+        const currentUserId = req.userId;
+        let currentUser;
 
         try {
-            user = await User.find()
+            currentUser = await User.findById(currentUserId)
         } catch (error) {
-            return console.log(error)
+            console.log(error);
+            return res.status(500).json({
+                message: 'Internal server error'
+            })
+        }
+        if(currentUserRole === 'adminzero'){
+            try {
+                user = await User.find()
+            } catch (error) {
+                console.log(error)
+                return res.status(500).json({
+                    message: 'Internal server error'
+                })
+            }
+        }else if (currentUserRole === 'proprietor' || currentUserRole === 'headmaster' || currentUserRole === 'adminone'){
+            try {
+                console.log(currentUser.school);
+                user = await User.find({ school: currentUser.school })
+            } catch (error) {
+                console.log(error)
+                return res.status(500).json({
+                    message: 'Internal server error'
+                })
+            }
         }
 
         if(!user){
@@ -23,29 +49,45 @@ const user = {
         return res.status(200).json({ user })
     },
 
-    //get user by id
+    //get user by id and role. user role determine user permission.
+    //Only adminzero user can view users regardless of the school.
+    //proprietor, adminone and headmaster users can only view users in their schools
     getUserByID: async (req, res) => {
-        const id = req.params.id;
-        console.log(id);
+        const { id } = req.params;
         let user;
-
-        if (!mongoose.isValidObjectId(id)) {
-            return res.status(400).json({
-                message: 'Invalid user ID'
-            })
-        }
-
+        const currentUserRole = req.userRole;
+        const currentUserId = req.userId;
+        let currentUser;
+        
         try {
+            currentUser = await User.findById(currentUserId)
             user = await User.findById(id)
-        } catch (error) {
-            return console.log(error)
+        }catch(error){
+            console.log(error);
+            return res.status(500).json({
+                message: 'Internal server error'
+            })
         }
         if(!user){
             return res.status(404).json({
                 message: 'No user found'
             })
         }
-        return res.status(200).json({ user })
+        if(currentUserRole === 'adminzero'){
+            return res.status(200).json({ user })
+        }else if(currentUserRole === 'proprietor' || currentUserRole === 'headmaster'){
+            if(user.school.toString()!== currentUser.school.toString()){
+                return res.status(400).json({
+                    message: 'You are not authorized to view this user'
+                })
+            }
+            return res.status(200).json({ user })
+        }else {
+            return res.status(400).json({
+                message: 'You are not authorized to view this user'
+            })
+        }
+        
     },
 
     //create new user for a particular school
@@ -143,9 +185,6 @@ const user = {
 
         res.cookie('token', token, { maxAge: 900000, httpOnly: true });
         return res.send({ success: true, token });
-        // return res.status(201).json({
-        //     message: `User ${name} ${phone} is successfully created!`
-        // })
     },
 
     //update user info
@@ -286,6 +325,7 @@ const user = {
         
         return res.status(200).json({ users })
     },
+    // get user profile
     userProfile: async (req, res) => {
         const token = req.cookies.token
 
@@ -303,6 +343,15 @@ const user = {
         } catch (error) {
             return res.status(400).json({ message: "Invalid token!" })
         }
+    },
+    // logout user out
+    logoutUser: async (req, res) =>{
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(400).json({ message: "No token provided!" })
+        }
+        res.clearCookie("token");
+        return res.status(200).json({ message: "Successfully logged out!" })
     }
 }
 

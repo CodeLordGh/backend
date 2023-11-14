@@ -8,7 +8,7 @@ studentRoute.get('/',auth.authUser, getAllStudents)
 studentRoute.post('/new',auth.authUser, auth.authRoleStudent, createStudent)
 studentRoute.put('/update/:id',auth.authUser, auth.authRoleStudent, updateStudent)
 studentRoute.delete('/delete/:id',auth.authRoleStudent, deleteStudent)
-studentRoute.get('/:id',auth.authUser, auth.authRoleStudent, getStudentById)
+studentRoute.get('/:id',auth.authUser, getStudentById)
 
 
 
