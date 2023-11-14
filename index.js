@@ -7,6 +7,8 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import studentRoute from './routes/studentRoutes.js';
 import userRoute from './routes/userRoute.js';
+import auth from './middleware/auth.js';
+import gradeRoute from './routes/gradeRoute.js';
 
 
 env.config();
@@ -21,17 +23,18 @@ app.use(cookieParser());
 app.use(session({
     secret: "nacHOlyt457BV",
     resave: false,
-    saveUninitialized: true
-    // cookie: {
-    //     secure: true,
-    //     maxAge: 1000 * 60 * 60 * 24,
-    //     httpOnly: true,
-    // },
+    saveUninitialized: true,
+    cookie: {
+        secure: true,
+        maxAge: 1000 * 60 * 60 * 24,
+        httpOnly: true,
+    },
 }))
 
 app.use('/api', userRoute)
-app.use('/api/school', schoolroutes);
-app.use('/api/student', studentRoute);
+app.use('/api/school',auth.checkLogin, schoolroutes);
+app.use('/api/student', auth.checkLogin, studentRoute);
+app.use('/api/grades',auth.checkLogin, gradeRoute)
 
 
 const dbpassword = process.env.DATABASEPASSWORD;

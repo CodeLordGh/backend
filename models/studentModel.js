@@ -26,7 +26,11 @@ const studentSchema = new schema({
     dateofbirth: {
         type: String,
         required: true
-    }
+    },
+    grades:[{
+        type: mongoose.Types.ObjectId,
+        ref: "Grade"
+    }]
 }, {timestamps: true})
 
 export default mongoose.model('Student', studentSchema)

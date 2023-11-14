@@ -183,7 +183,7 @@ const user = {
         req.session.user = user;
         req.session.token = token;
 
-        res.cookie('token', token, { maxAge: 900000, httpOnly: true });
+        res.cookie('id', user._id, { maxAge: 900000, httpOnly: true });
         return res.send({ success: true, token });
     },
 
@@ -300,8 +300,12 @@ const user = {
             token = jwt.sign({ phone, role: user.role, userId: user._id}, process.env.JWT_SECRET, { expiresIn: 3600 })
         }
         
+        req.session.user = user;
+        req.session.token = token;
+        
         res.cookie("token", token, { maxAge: 900000, httpOnly: true });
-        res.send({ success: true, token });
+        res.json({ success: true, message: "User logged in successfully" });
+        // res.redirect('/api/users/profile')
     },
 
     // get users by role and school
@@ -343,6 +347,7 @@ const user = {
         } catch (error) {
             return res.status(400).json({ message: "Invalid token!" })
         }
+        
     },
     // logout user out
     logoutUser: async (req, res) =>{
@@ -351,6 +356,7 @@ const user = {
             return res.status(400).json({ message: "No token provided!" })
         }
         res.clearCookie("token");
+        res.clearSession("user");
         return res.status(200).json({ message: "Successfully logged out!" })
     }
 }

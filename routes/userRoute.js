@@ -10,7 +10,7 @@ userRoute.post('/users/new', user.createUser);
 
 userRoute.delete('/users/delete/:id',auth.authUser, user.deleteUser)
 userRoute.post('/users/role', auth.authUser, user.getRoleBasedUsers);
-userRoute.get('/users/profile',auth.authUser, user.userProfile)
+userRoute.get('/users/profile',auth.checkLogin, user.userProfile)
 userRoute.get('/users/:id',auth.authUser, user.getUserByID)
 userRoute.post('/login', user.loginUser);
 userRoute.post('/logout', user.logoutUser)

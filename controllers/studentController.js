@@ -63,6 +63,7 @@ export const createStudent = async (req, res) => {
         firstname,
         lastname,
         dateofbirth,
+        grades,
         school,
         parent,
         level
