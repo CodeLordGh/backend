@@ -16,8 +16,11 @@ const auth = {
                 message: 'Unauthorized'
             })
         }
+
+        console.log(decoded)
         req.userClasses = decoded.userClasses
         req.userSubjects = decoded.userSubjects
+        req.userSchool = decoded.school
         req.userId = decoded.userId
         req.userRole = decoded.role
         next()

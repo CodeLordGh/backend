@@ -6,7 +6,7 @@ const gradeRoute = express.Router()
 
 gradeRoute.post('/addGrade',auth.authUser, auth.authRoleTeacher, grade.addGrade)
 
-gradeRoute.get('/getAllGrades/:studentId', grade.getAllGrades)
+gradeRoute.get('/getAllGrades/:studentId',auth.authUser, grade.getAllGrades)
 
 gradeRoute.get('/getGrade/:studentId/:subject', grade.getGrade)
 

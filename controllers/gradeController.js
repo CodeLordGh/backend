@@ -82,6 +82,7 @@ const grade = {
     // middleware to get all grades of a student
     getAllGrades: async (req, res) => {
         const { studentId } = req.params;
+        const currentUserRole = req.userRole;
         let student;
         
         if (!studentId) {
@@ -95,7 +96,19 @@ const grade = {
         }catch(error){
             return res.status(400).json({ message: "Student not found!" })
         }
-        return res.status(201).json(student.grades)
+        // check if current user is a parent user and get all records
+        if(currentUserRole === 'parent' && student.parent.toString() === req.userId.toString()){
+            return res.status(201).json(student.grades)
+        }
+        // check if current user is a teacher and get all records
+        if(currentUserRole === 'teacher' && req.userClasses.includes(student.level)){
+            return res.status(201).json(student.grades)
+        }
+        //checks if current user is an adminone and show all grades
+        if(currentUserRole === 'adminone' && student.school.toString() === req.userSchool.toString()){
+            return res.status(201).json(student.grades)
+        }
+        return res.status(400).json({ message: "You are not authorized to view this student's grades!" })
     },
     // middleware to get a grade of a student
     getGrade: async (req, res) => {

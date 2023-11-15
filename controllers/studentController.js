@@ -33,7 +33,11 @@ const getAllStudents = async (req, res) => {
 
 //Create new Student
 export const createStudent = async (req, res) => {
-    const { firstname, lastname, level, dateofbirth, parent, school } = req.body;
+
+    //create student object
+    const { mongoSanitize }  = mongoose;
+    const sanitizedInput = mongoSanitize(req.body)
+    const { firstname, lastname, level, dateofbirth, parent, school } = sanitizedInput;
     let existingStudent;
     let existingSchool;
     let existingParent;

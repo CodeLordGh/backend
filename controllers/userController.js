@@ -310,22 +310,23 @@ const user = {
 
     // get users by role and school
     getRoleBasedUsers: async (req, res) =>{
-        const { role, school } = req.body;
+        const { role } = req.body;
+        const userSchool = req.userSchool
         let users;
 
-        if (!role ||!school) {
+        if (!role ) {
             return res.status(400).json({ message: "All fields are mandatory!" })
         }
 
         try {
-            users = await User.find({ role, school })
+            users = await User.find({ role, school: userSchool })
         } catch (error) {
             console.log(error);
             return res.status(400).json({ message: 'Error retrieving data from the database' });
         }
         if (!users) {
             return res.status(400).json({ message: "No users found!" })
-        }
+        } 
         
         return res.status(200).json({ users })
     },

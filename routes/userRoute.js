@@ -5,7 +5,7 @@ import auth from '../middleware/auth.js';
 const userRoute = express();
 
 userRoute.get('/users',auth.authUser, user.getAllusers)
-userRoute.post('/users/new', user.createUser);
+userRoute.post('/users/new', user.createUser)
 
 
 userRoute.delete('/users/delete/:id',auth.authUser, user.deleteUser)
