@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/server.ts",
+    "start": "ts-node src/index.ts",
     "build": "tsc --build --verbose",
-    "dev":  "nodemon ./src/server.ts",
-    "serve": "node dist/server.js"
+    "dev":  "nodemon ./src/index.ts",
+    "serve": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
