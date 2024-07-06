@@ -1,6 +1,6 @@
 // api.test.ts
 import request from 'supertest';
-import app from "../server"
+import app from "../index"
 import { UserModel as User } from '../Models/user.model';
 
 
